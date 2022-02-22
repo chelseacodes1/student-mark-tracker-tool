@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <title>WAM Calculator</title>
+        <style>
+        h1 {
+            font-size: 45px;
+            font-weight: bold;
+            text-align: center;
+            color: rgba(7, 9, 122, 0.89)
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        h3 {
+            color:rgb(11, 122, 7); 
+        }
+
+        h4 {
+            font-size: 20px;
+            color:rgba(11, 122, 7, 0.603); 
+        }
+
+        h6 {
+            text-align: center; 
+        }
+        
+        .header img {
+            float: right;
+        }
+
+        .header h1 {
+            position: center;
+            top: 18px;
+            left: 10px;
+        }
+
+        br {
+        line-height: 100%;
+        }
+
+        #top, #middle, #bottom {
+            padding-left: 60px;
+        }
+
+        #top {
+            background-color: #0d6dfd6e;
+        }
+
+        #middle {
+            background-color: #0d6dfd42;
+        }
+
+        #bottom, html {
+            background-color: #0d6dfd33;
+        }
+
+        .tab-2 input{display: block;margin-bottom: 10px}
+            tr{transition:all .25s ease-in-out}
+            tr:hover{background-color:rgba(32, 78, 204, 0.788);cursor: pointer}
+        
+        #table {
+            text-align: center; 
+        }
+
+        </style>
+        
+    </head>
+    <body>
+    <section id = "top"> 
+        <div class="header">
+            <br> 
+            <img src="images/university-of-sydney-logo.png" width="160" height="55" alt="University of Sydney Logo"/>
+            <h1>WAM Calculator</h1>
+          </div>
+        
+        <h6><i>WAM (Weighted Average Mark) represents the average mark that is achieved across all units in a degree. <br> This is a tool that can be used to calculate your WAM and Grades. </i></h6>
+        
+        <br>
+        
+        <div id="myform">
+            <div class="form"></div>
+            <label for="currentWAM"><b>Enter your Current WAM:</b></label>
+            <input type="number" min="0" max = "100" id="currentWAM" size="4">
+            </div>
+        
+            <div class="form"></div>    
+            <label for="currentCredit"><b>Enter the Number of Credits related to your Current WAM:</b></label>
+            <input type="number" min="0" max = "500" id="currentCredit">
+            </div>
+        </div>
+        
+        <br><br> 
+        
+        </section>
+
+        <section id = "middle">
+            <br>
+            <p>Enter the following values for each subject. Use the buttons accordingly to make changes to the table. </p>
+            <div class="tab tab-2">
+                <b>Subject Name: </b><input type="text" name="name" id="name">
+                <b>Mark:</b> <input type="number" min="0" max = "100" name="mark"  id="mark">
+                <b>Credit Points:</b><input type="number" min="0" max = "6" name="credit" id="credit">
+                <button class="btn btn-primary" onclick = "addRow()">Add</button>
+                <button  class="btn btn-info" onclick = "editRow()">Edit/ Update</button>
+                <button class="btn btn-danger" onclick = "deleteTableRow()">Delete</button>
+            </div>
+            <br>
+            <h2>Subject List</h2>
+            <div class="tab tab-1">
+                <table id="table" border="1">
+                    <tr>
+                        <th>Subject Name</th>
+                        <th>Mark</th>
+                        <th>Credit Points</th>
+                    </tr>
+                </table>
+            </div>
+
+            <br><br>
+            <input type="button" class="btn btn-success" value="Calculate WAM"
+            onclick="submitTableData()">
+            <br><br>
+        </section>
+
+        <section id = "bottom"> 
+            <br>
+            <h3><b>Calculated Results</b></h3>
+            <h4><b>Semester Results: </b>based on the values in the 'Subject List' table</h4>
+            <h5 id="semesterWAM">Semester WAM: N/A </h5>
+            <h5 id="semesterGrade" style="height: 40px; width: 100%;">Semester Grade: N/A</h5>
+            
+            <h4><b>Overall Results: </b>based on your Current WAM & Credit Points and the Calculated Semester Results</h4>
+            <h5 id="overallWAM">Overall WAM: N/A</h5>
+            <h5 id="overallGrade">Overall Grade: N/A</h5>
+            <br><br><br><br> 
+        </section>
+
+        <script>
+            var rIndex;
+            var table = document.getElementById("table");
+
+            class Subject {
+    	        constructor(subjectName, mark, creditPoint) {
+                this.subjectName = subjectName;
+                this.mark = mark;
+                this.creditPoint = creditPoint;
+                }
+            }
+
+            function checkCurrentValues() {
+                var isEmpty = false;
+
+                currentWAM = document.getElementById("currentWAM").value;
+                currentCredit = document.getElementById("currentCredit").value;
+
+                if (currentWAM === "") {
+                    alert("'Current WAM' input field is empty. Please enter a integer between 0 and 100.");
+                    isEmpty = true;
+                } else if (currentCredit === "") {
+                    alert("'Number of Credits' input field is empty. Please enter an integer that is equal or greater than 0.");
+                    isEmpty = true; 
+                } else if (currentWAM < 0 || currentWAM > 100) {
+                    alert("'Current WAM' value is outside of the valid range. Please enter an integer between 0 and 100.");
+                    isEmpty = true;  
+                } else if (currentCredit < 0) {
+                    alert("'Number of Credits' value is outside of the valid range. Please enter an integer that is equal or greater than 0.");
+                    isEmpty = true; 
+                } return isEmpty; 
+            }
+
+            function checkEmptyInput(){
+                var isEmpty = false;
+                var name = document.getElementById("name").value;
+                var mark = document.getElementById("mark").value;
+                var credit = document.getElementById("credit").value;
+
+                if(name === ""){
+                    alert("'Subject Name' field is empty. Please enter input.");
+                    isEmpty = true;
+                } else if(mark === ""){
+                    alert("'Mark' field is empty. Please enter a valid positive integer between 0 and 100.");
+                    isEmpty = true;
+                } else if(credit === ""){
+                    alert("'Credit Points' field is empty. Please enter a valid positive integer between 0 and 6.");
+                    isEmpty = true;
+                } else if (mark < 0 || mark > 100) {
+                    alert("'Mark' value is outside of the valid range. Please enter a integer between 0 and 100.");
+                    isEmpty = true; 
+                } else if(credit < 0 || credit > 6) {
+                    alert("'Credit Points' value is outside of the valid range. Please enter a integer between 0 and 6.");
+                    isEmpty = true; 
+                } return isEmpty; 
+            }
+            
+  
+            function addRow(){
+                if(!checkEmptyInput()){
+                    var newRow = table.insertRow(table.length);
+                        cell1 = newRow.insertCell(0),
+                        cell2 = newRow.insertCell(1),
+                        cell3 = newRow.insertCell(2),
+                        subjectName = document.getElementById("name").value,
+                        mark = document.getElementById("mark").value,
+                        credit = document.getElementById("credit").value;
+                
+                    cell1.innerHTML = subjectName;
+                    cell2.innerHTML = mark;
+                    cell3.innerHTML = credit;
+
+                    selectedRowToInput();
+                }
+            }
+            
+            function selectedRowToInput() {
+                for(var i = 1; i < table.rows.length; i++){
+                    table.rows[i].onclick = function() {
+                      rIndex = this.rowIndex;
+                      document.getElementById("name").value = this.cells[0].innerHTML;
+                      document.getElementById("mark").value = this.cells[1].innerHTML;
+                      document.getElementById("credit").value = this.cells[2].innerHTML;
+                    };
+                }
+            }
+
+            selectedRowToInput();
+            
+            function editRow() {
+                var name = document.getElementById("name").value,
+                    mark = document.getElementById("mark").value,
+                    credit = document.getElementById("credit").value;
+               
+                if(!checkEmptyInput()){
+                    table.rows[rIndex].cells[0].innerHTML = name;
+                    table.rows[rIndex].cells[1].innerHTML = mark;
+                    table.rows[rIndex].cells[2].innerHTML = credit;
+                }
+            }
+            
+            function deleteTableRow() {
+                if (table.length == 1) {
+                    return false; 
+                } else {
+                    table.deleteRow(rIndex);
+                    
+                    document.getElementById("name").value = "";
+                    document.getElementById("mark").value = "";
+                    document.getElementById("credit").value = "";
+                } 
+            }
+
+            function submitTableData() {
+                var tableNode = document.getElementById("table");
+                var children = Array.from(tableNode.childNodes[1].children);
+                var i;
+                var subjects = [];
+
+                for (i = 1; i < children.length; i++) {
+                    var name = children[i].children[0].innerText 
+                    var mark =  parseFloat(children[i].children[1].innerText);
+                    var credit = parseInt(children[i].children[2].innerText);
+
+                    var subject = new Subject(name, mark, credit);
+                    subjects.push(subject);
+                }
+
+                if (!checkCurrentValues()) {
+                    calculateWAM(subjects);
+                }
+            }
+
+            function calculateWAM(subjects) {
+                var totalWeightedGrade = 0;
+                var totalCreditPoints = 0;
+                var currentWAM = parseFloat(document.getElementById("currentWAM").value);
+                var currentCredit = parseInt(document.getElementById("currentCredit").value);
+
+                for (var i = 0; i < subjects.length; i++) {
+                    totalWeightedGrade +=  subjects[i].mark * subjects[i].creditPoint;
+                    totalCreditPoints += subjects[i].creditPoint;
+                }
+
+                var wam = totalWeightedGrade / totalCreditPoints;
+                var overallWAM = (currentWAM * currentCredit + totalWeightedGrade) / (currentCredit + totalCreditPoints);
+
+                var semesterGrade; 
+                    if (wam >= 85){
+                        semesterGrade = "High Distinction";
+                    } else if (wam >= 75) {
+                        semesterGrade = "Distinction";
+                    } else if(wam >= 65) {
+                        semesterGrade = "Credit";
+                    } else if(wam >= 50) {
+                        semesterGrade = "Pass";
+                    } else {
+                        semesterGrade = "Fail";
+                    }
+                
+                var overallGrade;
+                    if (overallWAM >= 85){
+                    overallGrade = "High Distinction";
+                    } else if (overallWAM >= 75) {
+                        overallGrade = "Distinction";
+                    } else if(overallWAM >= 65) {
+                        overallGrade = "Credit";
+                    } else if(overallWAM >= 50) {
+                        overallGrade = "Pass";
+                    } else {
+                        overallGrade = "Fail";
+                    }
+
+                var pTag1 = document.getElementById("semesterWAM");
+                pTag1.innerText = "Your Semester WAM is: " + wam.toFixed(2);
+
+                var pTag2 = document.getElementById("semesterGrade");
+                pTag2.innerText = "Your Semester Grade is a: " + semesterGrade;
+
+                var pTag3 = document.getElementById("overallWAM");
+                pTag3.innerText = "Your Overall WAM is: " + overallWAM.toFixed(2);
+
+                var pTag4 = document.getElementById("overallGrade");
+                pTag4.innerText = "Your Overall Grade is a: " + overallGrade;
+            }
+        </script>
+    </body>
+</html>
